@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>robbing.homes</title>
+<link href="https://fonts.googleapis.com/css2?family=VT323&display=swap" rel="stylesheet" />
+<style>
+body {
+  margin: 0; padding: 0; background: #000; color: #c3c3c3;
+  font-family: 'VT323', monospace; display: flex; flex-direction: column;
+  align-items: center; justify-content: start; min-height: 100vh; overflow: hidden;
+}
+#hidden-bg {
+  position: fixed; top:0; left:0; width:100%; height:100%;
+  background: url('https://files.catbox.moe/h9ysgu.webp') center/cover no-repeat;
+  filter: brightness(0) blur(8px); z-index: -2; pointer-events: none; transition: filter 0.2s;
+}
+#bg {
+  position: fixed; top:0; left:0; width:100vw; height:100vh; z-index: -1;
+}
+#intro {
+  display: flex; flex-direction: column; align-items: center; justify-content: center; cursor:pointer; z-index:10; padding:20px;
+}
+#intro img {
+  width: 200px; opacity: 0.8; filter: drop-shadow(0 0 10px #f00);
+  animation: flicker 3s infinite alternate;
+}
+.menu {
+  margin-top: 20px; font-size: 1.8rem; color: #f33; text-shadow: 0 0 6px #f00;
+  animation: glitch 5s infinite, flicker 7s infinite;
+}
+.menu a { color: inherit; text-decoration: none; }
+#main {
+  display: none; padding: 40px 20px; width: 100%; min-height: 100vh; box-sizing: border-box; color: #fff; overflow-y: auto;
+}
+h1 { text-align: center; margin-bottom: 20px; font-size: 2rem; letter-spacing: 2px; }
+#rows { display: flex; flex-wrap: wrap; justify-content: center; gap: 20px; }
+.card {
+  width: 180px; height: 250px; perspective: 1000px; cursor:pointer; position: relative; transition: transform 0.3s, box-shadow 0.3s;
+}
+.card:hover { transform: scale(1.05); box-shadow: 0 4px 15px rgba(0,0,0,0.5); }
+.inner { width: 100%; height: 100%; transition: transform 0.8s; transform-style: preserve-3d; position: relative; }
+.front, .back {
+  position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+  border-radius: 12px; overflow: hidden; backface-visibility: hidden; display: flex; flex-direction: column; align-items: center; justify-content: flex-start; background: rgba(0,0,0,0.6);
+  border: 2px solid #fff; box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+}
+.front img {
+  width: 100%; height: 60%; object-fit: cover;
+  border-bottom: 2px solid #fff;
+}
+.front span {
+  margin-top: 8px; font-weight: bold; font-size: 1.1rem; text-align: center;
+}
+.role {
+  font-size: 0.75rem; margin-top: 4px; color: #ccc;
+}
+.back {
+  transform: rotateY(180deg); padding: 10px; font-size: 0.75rem; text-align: center; align-items: center; justify-content: center;
+}
+</style>
+</head>
+<body>
+<div id="hidden-bg"></div>
+<canvas id="bg"></canvas>
+<div id="intro">
+  <img src="https://files.catbox.moe/fy0v6l.png" alt="logo" />
+  <div class="menu glitch"><a href="#">robbing.homes</a></div>
+</div>
+<div id="main">
+  <h1>robbing.homes</h1>
+  <div id="rows"></div>
+</div>
+<script>
+const titles=["r","ro","rob","robb","robbi","robbin","robbing","robbing.","robbing.h","robbing.ho","robbing.hom","robbing.home","robbing.homes","robbing.home","robbing.hom","robbing.ho","robbing.h","robbing.","robbing","robbin","robbi","robb","rob","ro","r"];
+let t=0; setInterval(()=>{document.title=titles[t]; t=(t+1)%titles.length;},200);
+document.addEventListener('mousemove', e => {
+  const s=document.createElement('div');
+  s.className='sparkle';
+  s.style.left=e.pageX+'px'; s.style.top=e.pageY+'px';
+  document.body.appendChild(s);
+  setTimeout(()=>s.remove(),500);
+});
+const intro=document.getElementById('intro');
+const main=document.getElementById('main');
+intro.onclick=()=>{ intro.style.display='none'; main.style.display='block'; loadRoster(); startVisualizer(); };
+const roster=[
+  {name:'Violence', role:'Owner', img:'https://files.catbox.moe/fy0v6l.png', bio:'Violence', profile:'#'},
+  {name:'Phantom', role:'Co-Owner', img:'https://files.catbox.moe/63sdgg.png', bio:'Snow Leopard', profile:'#'}
+];
+function loadRoster() {
+  const container=document.getElementById('rows');
+  const row=document.createElement('div'); row.className='row';
+  roster.forEach(m => {
+    const card=document.createElement('div'); card.className='card';
+    card.innerHTML=`
+      <div class="inner">
+        <div class="front">
+          <img src="${m.img}">
+          <span>${m.name}</span>
+          <div class="role">${m.role}</div>
+        </div>
+        <div class="back">${m.bio}</div>
+      </div>`;
+    card.onclick=()=>{window.location.href=m.profile;};
+    row.appendChild(card);
+  });
+  document.getElementById('rows').appendChild(row);
+}
+async function startVisualizer() {
+  const url="https://files.catbox.moe/wkdgui.mp3";
+  const c=document.getElementById('bg'); const ctx=c.getContext('2d');
+  c.width=window.innerWidth; c.height=window.innerHeight;
+  const audioCtx=new (window.AudioContext||window.webkitAudioContext)();
+  const res=await fetch(url);
+  const buf=await res.arrayBuffer();
+  const data=await audioCtx.decodeAudioData(buf);
+  const src=audioCtx.createBufferSource();
+  src.buffer=data; 
+  const analyser=audioCtx.createAnalyser(); analyser.fftSize=256;
+  const array=new Uint8Array(analyser.frequencyBinCount);
+  src.connect(analyser); analyser.connect(audioCtx.destination); src.start();
+  function animate() {
+    requestAnimationFrame(animate);
+    analyser.getByteFrequencyData(array);
+    const avg=array.reduce((a,b)=>a+b,0)/array.length;
+    const bass=array.slice(0,15).reduce((a,b)=>a+b,0)/15;
+    ctx.clearRect(0,0,c.width,c.height);
+    const x=c.width/2; const y=c.height/2; const orb=180+bass*2;
+    const glow=Math.min(avg/100,1);
+    const grad=ctx.createRadialGradient(x,y,0,x,y,orb);
+    grad.addColorStop(0,`rgba(255,30,30,${0.8*glow})`);
+    grad.addColorStop(0.6,`rgba(255,0,0,${0.3*glow})`);
+    grad.addColorStop(1,`rgba(0,0,0,0)`);
+    ctx.fillStyle=grad; ctx.fillRect(0,0,c.width,c.height);
+    document.getElementById('hidden-bg').style.filter=`brightness(${Math.min(avg/50,1.8)}) blur(${8 - Math.min(avg/80,6)}px)`;
+    document.body.style.background=`rgba(${bass*2},0,0,${Math.min(avg/300,0.3)})`;
+    const title=document.querySelector('h1');
+    if(title){ title.style.textShadow=`0 0 ${Math.min(avg/3,80)}px #f00`; }
+    document.querySelectorAll('.front').forEach(c => {
+      c.style.boxShadow=`0 0 ${Math.min(bass/2,50)}px #f00`;
+      c.style.borderColor=`rgba(255,${avg/2},${avg/4},1)`;
+      c.style.filter=`brightness(${1+avg/200})`;
+    });
+    document.querySelectorAll('.back').forEach(c => {
+      c.style.boxShadow=`inset 0 0 ${Math.min(bass/2,50)}px #f00`;
+      c.style.background=`rgba(${Math.min(bass*3,255)},0,0,${0.3+avg/400})`;
+      c.style.borderColor=`rgba(255,${avg/2},${avg/4},1)`;
+      c.style.filter=`brightness(${1+avg/250})`;
+    });
+    document.querySelectorAll('img').forEach(i => {
+      i.style.filter=`drop-shadow(0 0 ${Math.min(avg/2,50)}px #f00)`;
+    });
+  }
+  animate();
+}
+</script>
+</body>
+</html>
