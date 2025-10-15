@@ -13,6 +13,7 @@
     margin: 0; padding: 20px;
     max-width: 800px;
     margin-left: auto; margin-right: auto;
+    position: relative;
   }
   h1 {
     font-size: 2rem;
@@ -40,6 +41,19 @@
     color: #fff;
     transform: scale(1.05);
   }
+  .sparkle {
+    position: absolute;
+    width: 4px;
+    height: 4px;
+    background: #fff;
+    border-radius: 50%;
+    pointer-events: none;
+    animation: fade 0.5s forwards;
+  }
+  @keyframes fade {
+    0% { opacity: 1; }
+    100% { opacity: 0; transform: translateY(-10px); }
+  }
 </style>
 </head>
 <body>
@@ -51,5 +65,16 @@
   Little is known about Phantom’s origins, but their loyalty to the cause and their mastery of stealth make them a vital member of the team. They prefer to operate behind the scenes, ensuring that every move is calculated and silent.
 </p>
 <a class="back" href="../index.html">Back to Home</a>
+
+<script>
+document.addEventListener('mousemove', e => {
+  const s = document.createElement('div');
+  s.className = 'sparkle';
+  s.style.left = `${e.pageX}px`;
+  s.style.top = `${e.pageY}px`;
+  document.body.appendChild(s);
+  setTimeout(() => s.remove(), 500);
+});
+</script>
 </body>
 </html>
