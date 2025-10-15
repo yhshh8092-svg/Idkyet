@@ -8,99 +8,240 @@
 <style>
   body {
     margin: 0; padding: 0;
-    background: #000; color: #c3c3c3;
+    background: #000;
+    color: #c3c3c3;
     font-family: 'VT323', monospace;
-    display: flex; flex-direction: column; justify-content: center; align-items: center;
-    height: 100vh; overflow: hidden;
-    transition: background 0.1s;
+    height: 100vh;
+    overflow: hidden;
+    cursor: none; /* hide default cursor */
+    position: relative;
   }
-  #hidden-bg {
-    position: fixed; inset: 0;
-    background: url('https://files.catbox.moe/h9ysgu.webp') center/cover no-repeat;
-    filter: brightness(0) blur(8px);
-    transition: filter 0.15s;
-    z-index: -2;
+
+  /* Custom cursor style */
+  #customCursor {
+    position: fixed;
+    width: 20px;
+    height: 20px;
+    background: rgba(255, 60, 60, 0.8);
+    border-radius: 50%;
+    pointer-events: none;
+    transform: translate(-50%, -50%);
+    z-index: 9999;
+    border: 2px solid #fff;
+    box-shadow: 0 0 10px #ff0000;
+    transition: transform 0.05s ease;
   }
-  #bg {
-    position: fixed; inset: 0;
-    z-index: -1;
-  }
-  #intro {
-    display: flex; flex-direction: column; align-items: center; cursor: pointer;
-  }
-  #intro .glitch {
-    font-size: 1.8rem; color: #ff3b3b; text-shadow: 0 0 6px #ff0000;
-    animation: glitch 5s infinite, flicker 7s infinite;
-  }
-  #intro a { color: inherit; text-decoration: none; }
-  #main-page {
-    display: none; padding: 40px 20px; width: 100%; min-height: 100vh;
-    overflow-y: auto; color: #fff;
-  }
-  h1 { text-align: center; margin-bottom: 20px; }
-  .row {
-    display: flex; flex-wrap: wrap; gap: 20px; justify-content: center; margin-bottom: 20px;
-  }
-  .flip-card {
-    width: 150px; height: 220px; perspective: 1000px; border-radius: 12px; overflow: hidden; border: 2px solid #fff; cursor: pointer;
-  }
-  .flip-card-inner {
-    width: 100%; height: 100%; transition: transform 0.6s; transform-style: preserve-3d;
-  }
-  .flip-card:hover .flip-card-inner { transform: rotateY(180deg); }
-  .front, .back {
-    position: absolute; inset: 0; backface-visibility: hidden; display: flex; flex-direction: column; align-items: center; justify-content: flex-start; padding: 10px; box-sizing: border-box;
-  }
-  .front {
-    background: rgba(0,0,0,0.6); backdrop-filter: blur(4px);
-  }
-  .front img {
-    width: 100%; height: 65%; object-fit: cover; border-bottom: 2px solid #fff;
-  }
-  .front span { margin-top: 5px; font-weight: bold; }
-  .role { font-size: 12px; color: #ccc; margin-top: 2px; }
-  .back {
-    background: rgba(0,0,0,0.85); transform: rotateY(180deg); font-size: 12px; display: flex; align-items: center; justify-content: center; text-align: center;
-  }
+
+  /* Sparkle effect styles */
   .sparkle {
-    position: absolute; width: 4px; height: 4px; background: #fff; border-radius: 50%; pointer-events: none; animation: fade 0.5s forwards;
+    position: absolute;
+    width: 4px;
+    height: 4px;
+    background: #fff;
+    border-radius: 50%;
+    pointer-events: none;
+    animation: fade 0.5s forwards;
   }
-  @keyframes glitch { 0% { transform: none; } 20% { skew(0.5deg, 0.5deg); } 40% { translateX(-2px); } 60% { translateX(2px); } 80% { skew(-0.5deg, -0.5deg); } 100% { transform: none; } }
-  @keyframes flicker { 0%, 18%, 22%, 25%, 53%, 57%, 100% { opacity: 1; } 20%, 24%, 55% { opacity: 0.5; } }
-  @keyframes fade { 0% { opacity: 1; } 100% { opacity: 0; transform: translateY(-10px); } }
+  @keyframes fade {
+    0% { opacity: 1; }
+    100% { opacity: 0; transform: translateY(-10px); }
+  }
+
+  /* Content styles for intro and main */
+#content {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+  width: 100%;
+  text-align: center;
+}
+
+/* Intro screen styles */
+#intro {
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: #000;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  z-index: 10;
+}
+#intro h1 {
+  font-size: 4rem;
+  margin-bottom: 30px;
+  color: #ff3b3b;
+  text-shadow: 0 0 10px #ff0000;
+  cursor: pointer;
+  animation: glitch 2s infinite alternate;
+}
+#enterBtn {
+  padding: 15px 30px;
+  font-size: 1.8rem;
+  background: transparent;
+  border: 3px solid #ff0000;
+  border-radius: 10px;
+  color: #ff0000;
+  cursor: pointer;
+  transition: background 0.3s, color 0.3s, transform 0.2s;
+}
+#enterBtn:hover {
+  background: #ff0000;
+  color: #fff;
+  transform: scale(1.05);
+}
+
+/* Main page styles */
+#main {
+  display: none;
+  padding: 40px 20px;
+  width: 100%;
+  box-sizing: border-box;
+  overflow-y: auto;
+}
+h2 {
+  text-align: center;
+  margin-bottom: 20px;
+  font-size: 2rem;
+  color: #ff3b3b;
+  text-shadow: 0 0 8px #ff0000;
+}
+.row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+  justify-content: center;
+}
+
+/* Card styles */
+.flip-card {
+  width: 150px;
+  height: 220px;
+  perspective: 1000px;
+  cursor: pointer;
+  border-radius: 12px;
+  overflow: hidden;
+  border: 2px solid #fff;
+}
+.flip-card-inner {
+  width: 100%;
+  height: 100%;
+  transition: transform 0.6s;
+  transform-style: preserve-3d;
+}
+.flip-card:hover .flip-card-inner {
+  transform: rotateY(180deg);
+}
+.front, .back {
+  position: absolute; inset: 0;
+  backface-visibility: hidden;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  padding: 10px;
+  box-sizing: border-box;
+}
+.front {
+  background: rgba(0,0,0,0.6);
+  backdrop-filter: blur(4px);
+}
+.front img {
+  width: 100%;
+  height: 65%;
+  object-fit: cover;
+  border-bottom: 2px solid #fff;
+}
+.front span {
+  margin-top: 5px;
+  font-weight: bold;
+}
+.role {
+  font-size: 12px;
+  color: #ccc;
+  margin-top: 2px;
+}
+.back {
+  background: rgba(0,0,0,0.85);
+  transform: rotateY(180deg);
+  font-size: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+}
+
+/* Optional: Add hover effect for cards */
 </style>
 </head>
 <body>
-<div id="hidden-bg"></div>
-<canvas id="bg"></canvas>
+
+<div id="customCursor"></div>
+
+<!-- Intro Screen -->
 <div id="intro">
-  <div class="glitch"><a href="#">robbing.homes</a></div>
-</div>
-<div id="main-page">
   <h1>robbing.homes</h1>
-  <div id="rows-container"></div>
+  <button id="enterBtn">Enter</button>
 </div>
+
+<!-- Main Content -->
+<div id="main">
+  <h2>Our Team</h2>
+  <div class="row" id="cardsContainer"></div>
+</div>
+
 <script>
+const cursor = document.getElementById('customCursor');
+const intro = document.getElementById('intro');
+const main = document.getElementById('main');
+const enterBtn = document.getElementById('enterBtn');
+const cardsContainer = document.getElementById('cardsContainer');
+
+// Sample roster data
 const roster = [
-  { name: 'Violence', role: 'Owner', img: 'https://files.catbox.moe/fy0v6l.png', bio: 'Violence bio...', profile: 'bio/violence.html', bioUrl: 'bio/violence.html' },
-  { name: 'Phantom', role: 'Co-Owner', img: 'https://files.catbox.moe/63sdgg.png', bio: 'Phantom bio...', profile: 'bio/phantom.html', bioUrl: 'bio/phantom.html' }
+  {
+    name: 'Violence',
+    role: 'Owner',
+    img: 'https://files.catbox.moe/fy0v6l.png',
+    bio: 'Violence bio...',
+    profile: 'bio/violence.html',
+    bioUrl: 'bio/violence.html'
+  },
+  {
+    name: 'Phantom',
+    role: 'Co-Owner',
+    img: 'https://files.catbox.moe/63sdgg.png',
+    bio: 'Phantom bio...',
+    profile: 'bio/phantom.html',
+    bioUrl: 'bio/phantom.html'
+  }
 ];
 
-const intro = document.getElementById('intro');
-const mainPage = document.getElementById('main-page');
+// Animate custom cursor
+document.addEventListener('mousemove', e => {
+  cursor.style.left = `${e.clientX}px`;
+  cursor.style.top = `${e.clientY}px`;
 
-intro.onclick = () => {
+  // Sparkle effect
+  const s = document.createElement('div');
+  s.className = 'sparkle';
+  s.style.left = `${e.pageX}px`;
+  s.style.top = `${e.pageY}px`;
+  document.body.appendChild(s);
+  setTimeout(() => s.remove(), 500);
+});
+
+// Button to enter main content
+enterBtn.onclick = () => {
   intro.style.display = 'none';
-  mainPage.style.display = 'block';
-  loadRoster();
-  initVisualizer();
+  main.style.display = 'block';
+  loadCards();
 };
 
-function loadRoster() {
-  const container = document.getElementById('rows-container');
-  const row = document.createElement('div');
-  row.className = 'row';
-
+// Load cards into the container
+function loadCards() {
   roster.forEach(member => {
     const card = document.createElement('div');
     card.className = 'flip-card';
@@ -113,91 +254,12 @@ function loadRoster() {
         </div>
         <div class="back">${member.bio}</div>
       </div>`;
-    // Navigate to member's bio page on click
+    // Navigate to profile on click
     card.onclick = () => { window.location.href = member.bioUrl; };
-    row.appendChild(card);
+    cardsContainer.appendChild(card);
   });
-  container.appendChild(row);
-}
-
-// Audio visualizer setup
-async function initVisualizer() {
-  const url = 'https://files.catbox.moe/wkdgui.mp3';
-  const canvas = document.getElementById('bg');
-  const ctx = canvas.getContext('2d');
-  const hiddenBg = document.getElementById('hidden-bg');
-
-  const resize = () => {
-    canvas.width = window.innerWidth;
-    canvas.height = window.innerHeight;
-  };
-  window.addEventListener('resize', resize);
-  resize();
-
-  const ctxAudio = new (window.AudioContext || window.webkitAudioContext)();
-  const response = await fetch(url);
-  const buffer = await response.arrayBuffer();
-  const audioBuffer = await ctxAudio.decodeAudioData(buffer);
-  const source = ctxAudio.createBufferSource();
-  source.buffer = audioBuffer;
-  const analyser = ctxAudio.createAnalyser();
-  analyser.fftSize = 256;
-  const dataArray = new Uint8Array(analyser.fftSize);
-  source.connect(analyser);
-  analyser.connect(ctxAudio.destination);
-  source.start();
-
-  const elements = {
-    body: document.body,
-    menu: document.querySelector('.glitch'),
-    title: document.querySelector('h1'),
-    imgs: document.querySelectorAll('img'),
-    front: document.querySelectorAll('.front'),
-    back: document.querySelectorAll('.back')
-  };
-
-  const animate = () => {
-    requestAnimationFrame(animate);
-    analyser.getByteFrequencyData(dataArray);
-    const total = dataArray.reduce((a, v) => a + v, 0) / dataArray.length;
-    const bass = dataArray.slice(0, 15).reduce((a, v) => a + v, 0) / 15;
-
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-    const cx = canvas.width / 2;
-    const cy = canvas.height / 2;
-    const radius = 180 + bass * 2;
-    const glow = Math.min(total / 100, 1);
-    const gradient = ctx.createRadialGradient(cx, cy, 0, cx, cy, radius);
-    gradient.addColorStop(0, `rgba(255,30,30,${0.8 * glow})`);
-    gradient.addColorStop(0.6, `rgba(255,0,0,${0.3 * glow})`);
-    gradient.addColorStop(1, `rgba(0,0,0,0)`);
-    ctx.fillStyle = gradient;
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-    hiddenBg.style.filter = `brightness(${Math.min(total / 50, 1.8)}) blur(${8 - Math.min(total / 80, 6)}px)`;
-    document.body.style.background = `rgba(${bass * 2},0,0,${Math.min(total / 300, 0.3)})`;
-    elements.menu.style.textShadow = `0 0 ${Math.min(total / 3, 80)}px #ff0000`;
-
-    [...elements.front].forEach(c => {
-      c.style.boxShadow = `0 0 ${Math.min(bass / 2, 50)}px #ff0000`;
-      c.style.borderColor = `rgba(255, ${total / 2}, ${total / 4}, 1)`;
-      c.style.filter = `brightness(${1 + total / 200})`;
-    });
-    [...elements.back].forEach(c => {
-      c.style.boxShadow = `inset 0 0 ${Math.min(bass / 2, 50)}px #ff0000`;
-      c.style.background = `rgba(${Math.min(bass * 3, 255)}, 0, 0, ${0.3 + total / 400})`;
-      c.style.borderColor = `rgba(255, ${total / 2}, ${total / 4}, 1)`;
-      c.style.filter = `brightness(${1 + total / 250})`;
-    });
-    [...elements.imgs].forEach(i => {
-      i.style.filter = `drop-shadow(0 0 ${Math.min(total / 2, 50)}px #ff0000)`;
-    });
-    if (elements.title) {
-      elements.title.style.textShadow = `0 0 ${Math.min(total / 3, 50)}px #ff0000`;
-    }
-  };
-  animate();
 }
 </script>
+
 </body>
 </html>
