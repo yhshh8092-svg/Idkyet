@@ -81,53 +81,56 @@
   <div id="rows-container"></div>
 </div>
 <script>
-const titles = ["r","ro","rob","robb","robbi","robbin","robbing","robbing.","robbing.h","robbing.ho","robbing.hom","robbing.home","robbing.homes","robbing.home","robbing.hom","robbing.ho","robbing.h","robbing.","robbing","robbin","robbi","robb","rob","ro","r"];
-let titleIdx = 0;
-setInterval(() => { document.title = titles[titleIdx]; titleIdx = (titleIdx + 1) % titles.length; }, 200);
-document.addEventListener('mousemove', e => { createSparkle(e.pageX, e.pageY); });
-function createSparkle(x, y) {
-  const s = document.createElement('div');
-  s.className = 'sparkle';
-  s.style.left = `${x}px`; s.style.top = `${y}px`;
-  document.body.appendChild(s);
-  setTimeout(() => s.remove(), 500);
-}
+const roster = [
+  { name: 'Violence', role: 'Owner', img: 'https://files.catbox.moe/fy0v6l.png', bio: 'Violence bio...', profile: 'bio/violence.html', bioUrl: 'bio/violence.html' },
+  { name: 'Phantom', role: 'Co-Owner', img: 'https://files.catbox.moe/63sdgg.png', bio: 'Phantom bio...', profile: 'bio/phantom.html', bioUrl: 'bio/phantom.html' }
+];
+
 const intro = document.getElementById('intro');
 const mainPage = document.getElementById('main-page');
-const roster = [
-  { name: 'Violence', role: 'Owner', img: 'https://files.catbox.moe/fy0v6l.png', bio: 'violence', profile: '#' },
-  { name: 'Phantom', role: 'Co-Owner', img: 'https://files.catbox.moe/63sdgg.png', bio: 'snow leopard', profile: '#' }
-];
+
 intro.onclick = () => {
-  intro.style.display = 'none'; mainPage.style.display = 'block'; loadRoster(); initVisualizer();
+  intro.style.display = 'none';
+  mainPage.style.display = 'block';
+  loadRoster();
+  initVisualizer();
 };
+
 function loadRoster() {
   const container = document.getElementById('rows-container');
   const row = document.createElement('div');
   row.className = 'row';
-  roster.forEach(m => {
+
+  roster.forEach(member => {
     const card = document.createElement('div');
     card.className = 'flip-card';
     card.innerHTML = `
       <div class="flip-card-inner">
         <div class="front">
-          <img src="${m.img}">
-          <span>${m.name}</span>
-          <div class="role">${m.role}</div>
+          <img src="${member.img}">
+          <span>${member.name}</span>
+          <div class="role">${member.role}</div>
         </div>
-        <div class="back">${m.bio}</div>
+        <div class="back">${member.bio}</div>
       </div>`;
-    card.onclick = () => { window.location.href = m.profile; };
+    // Navigate to member's bio page on click
+    card.onclick = () => { window.location.href = member.bioUrl; };
     row.appendChild(card);
   });
   container.appendChild(row);
 }
+
+// Audio visualizer setup
 async function initVisualizer() {
   const url = 'https://files.catbox.moe/wkdgui.mp3';
   const canvas = document.getElementById('bg');
   const ctx = canvas.getContext('2d');
   const hiddenBg = document.getElementById('hidden-bg');
-  const resize = () => { canvas.width = window.innerWidth; canvas.height = window.innerHeight; };
+
+  const resize = () => {
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+  };
   window.addEventListener('resize', resize);
   resize();
 
@@ -139,7 +142,7 @@ async function initVisualizer() {
   source.buffer = audioBuffer;
   const analyser = ctxAudio.createAnalyser();
   analyser.fftSize = 256;
-  const data = new Uint8Array(analyser.frequencyBinCount);
+  const dataArray = new Uint8Array(analyser.fftSize);
   source.connect(analyser);
   analyser.connect(ctxAudio.destination);
   source.start();
@@ -155,9 +158,9 @@ async function initVisualizer() {
 
   const animate = () => {
     requestAnimationFrame(animate);
-    analyser.getByteFrequencyData(data);
-    const total = data.reduce((a, v) => a + v, 0) / data.length;
-    const bass = data.slice(0, 15).reduce((a, v) => a + v, 0) / 15;
+    analyser.getByteFrequencyData(dataArray);
+    const total = dataArray.reduce((a, v) => a + v, 0) / dataArray.length;
+    const bass = dataArray.slice(0, 15).reduce((a, v) => a + v, 0) / 15;
 
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     const cx = canvas.width / 2;
